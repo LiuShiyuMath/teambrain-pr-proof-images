@@ -4,8 +4,8 @@
 
 - Source repo: `libz-renlab-ai/TeamBrain`
 - Snapshot state: GitHub `merged` PRs
-- Image count: `270`
-- Generated at: `2026-05-12T14:35:34.527Z`
+- Image count: `271`
+- Generated at: `2026-05-12T15:05:07.912Z`
 - Cover/background: generated with `image_gen.imagegen`
 - PR cards: deterministic SVG-to-PNG render so Chinese text, PR numbers, URLs, commit hashes, and stats stay exact.
 

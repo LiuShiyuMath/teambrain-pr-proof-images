@@ -1,10 +1,10 @@
 {
   "version": 1,
-  "generatedAt": "2026-05-12T14:35:34.527Z",
+  "generatedAt": "2026-05-12T15:05:07.912Z",
   "sourceRepo": "libz-renlab-ai/TeamBrain",
   "sourcePrState": "merged",
   "imageTool": "image_gen.imagegen cover plus deterministic SVG-to-PNG card renderer",
-  "count": 270,
+  "count": 271,
   "commentMarkerPrefix": "<!-- teambrain-pr-proof-work:image:v1",
   "images": [
     {
@@ -2965,6 +2965,17 @@
       "imagePath": "images/pr-0391.png",
       "rawUrl": "https://raw.githubusercontent.com/LiuShiyuMath/teambrain-pr-proof-images/main/images/pr-0391.png",
       "commentMarker": "<!-- teambrain-pr-proof-work:image:v1 pr=391 -->"
+    },
+    {
+      "pr": 392,
+      "title": "docs(permission-anchors): /review subagent + claimed-worktree FIXEDFLOW canned answers",
+      "mergedAt": "2026-05-12T14:33:45Z",
+      "author": "LiuShiyuMath",
+      "mergeCommit": "3079c9b87df27f1ba3eb0c5d052b1e112e96ed18",
+      "url": "https://github.com/libz-renlab-ai/TeamBrain/pull/392",
+      "imagePath": "images/pr-0392.png",
+      "rawUrl": "https://raw.githubusercontent.com/LiuShiyuMath/teambrain-pr-proof-images/main/images/pr-0392.png",
+      "commentMarker": "<!-- teambrain-pr-proof-work:image:v1 pr=392 -->"
     },
     {
       "pr": 393,
