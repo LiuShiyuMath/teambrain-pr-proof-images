@@ -1,0 +1,4 @@
+# Symphony PR Proof
+* Date: 2026-05-13
+* Issue: GAM-6
+* Demonstrates: docs(symphony) sandbox shape correction.
