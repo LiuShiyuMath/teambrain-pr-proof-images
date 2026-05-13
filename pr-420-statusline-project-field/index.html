@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PR #420 visual proof — statusline 项目:&lt;name&gt; field</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: #0d1117; color: #c9d1d9; line-height: 1.55;
+    padding: 32px 24px 80px; max-width: 1080px; margin: 0 auto;
+  }
+  h1 { font-size: 24px; margin: 0 0 8px; color: #f0f6fc; font-weight: 600; }
+  h2 { font-size: 18px; margin: 36px 0 12px; color: #f0f6fc; border-bottom: 1px solid #30363d; padding-bottom: 6px; }
+  h3 { font-size: 14px; margin: 20px 0 6px; color: #c9d1d9; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  a { color: #58a6ff; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code, pre, .term { font-family: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; }
+
+  .meta { color: #8b949e; font-size: 13px; margin-bottom: 18px; }
+  .meta strong { color: #c9d1d9; }
+  .meta a { color: #58a6ff; }
+
+  .disclaimer {
+    background: #2d1b00; border: 1px solid #6e4500; color: #ffd58a;
+    padding: 12px 16px; border-radius: 8px; margin: 16px 0 28px;
+    font-size: 13px;
+  }
+  .disclaimer strong { color: #ffe9b5; }
+
+  .badges { margin: 8px 0 20px; }
+  .badge {
+    display: inline-block; padding: 3px 10px; margin-right: 6px; border-radius: 999px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.03em;
+  }
+  .badge.merged { background: #6e40c9; color: #fff; }
+  .badge.proposer { background: #1f6feb; color: #fff; }
+  .badge.reviewer { background: #30363d; color: #c9d1d9; }
+
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+    margin: 12px 0 24px;
+  }
+  .stat { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 12px; }
+  .stat .n { font-size: 22px; font-weight: 600; color: #f0f6fc; }
+  .stat .l { font-size: 11px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .term {
+    background: #010409; color: #e6edf3; padding: 14px 18px;
+    border-radius: 8px; border: 1px solid #30363d;
+    font-size: 13px; line-height: 1.7; overflow-x: auto;
+    white-space: nowrap;
+  }
+  .term .ins { background: #033a16; color: #7ee787; padding: 0 4px; border-radius: 3px; font-weight: 600; }
+  .term .del { background: #67060c; color: #ffa198; padding: 0 4px; border-radius: 3px; text-decoration: line-through; }
+  .term .dim { color: #6e7681; }
+  .term .hint { color: #ffa657; }
+
+  .case {
+    background: #161b22; border: 1px solid #30363d; border-radius: 8px;
+    padding: 14px 18px; margin: 14px 0;
+  }
+  .case .title { font-weight: 600; color: #f0f6fc; font-size: 14px; margin-bottom: 4px; }
+  .case .cwd { color: #8b949e; font-size: 12px; margin-bottom: 8px; font-family: "SF Mono", Menlo, monospace; }
+  .case .cwd code { color: #79c0ff; }
+  .case .why { color: #8b949e; font-size: 12px; margin-top: 8px; font-style: italic; }
+  .case .verdict {
+    display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px;
+    font-weight: 600; margin-left: 8px;
+  }
+  .verdict.real { background: #033a16; color: #7ee787; }
+  .verdict.derived { background: #2d1b00; color: #ffd58a; }
+
+  .diff {
+    background: #010409; border: 1px solid #30363d; border-radius: 8px;
+    padding: 14px 18px; font-size: 12px; line-height: 1.6; overflow-x: auto;
+    margin: 12px 0;
+  }
+  .diff .hdr { color: #8b949e; }
+  .diff .add { color: #7ee787; }
+  .diff .sub { color: #ffa198; }
+  .diff .ctx { color: #c9d1d9; }
+
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #30363d; vertical-align: top; }
+  th { color: #f0f6fc; background: #161b22; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+  td code { background: #161b22; padding: 1px 6px; border-radius: 3px; color: #79c0ff; font-size: 12px; }
+
+  .footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #30363d; color: #6e7681; font-size: 12px; }
+  .footer code { background: #161b22; padding: 1px 6px; border-radius: 3px; color: #c9d1d9; }
+
+  pre.repro {
+    background: #010409; color: #c9d1d9; padding: 14px 18px;
+    border-radius: 8px; border: 1px solid #30363d;
+    font-size: 12px; line-height: 1.6; overflow-x: auto;
+    white-space: pre;
+  }
+  pre.repro .cmt { color: #8b949e; }
+  pre.repro .cmd { color: #7ee787; }
+</style>
+</head>
+<body>
+
+<h1>PR #420 — <code style="color:#79c0ff">feat(statusline): add 项目:&lt;name&gt; field (worktree-aware presence)</code></h1>
+
+<div class="meta">
+  Repo: <a href="https://github.com/libz-renlab-ai/TeamBrain">libz-renlab-ai/TeamBrain</a> ·
+  PR: <a href="https://github.com/libz-renlab-ai/TeamBrain/pull/420">#420</a> ·
+  Closes <a href="https://github.com/libz-renlab-ai/TeamBrain/issues/306">issue #306</a> ·
+  Head SHA: <strong>8039f4ef</strong>
+</div>
+
+<div class="badges">
+  <span class="badge merged">MERGED</span>
+  <span class="badge proposer">proposer: @libz-renlab-ai</span>
+  <span class="badge reviewer">third-party visual proof: @LiuShiyuMath</span>
+</div>
+
+<div class="disclaimer">
+  <strong>第三方 visual proof 声明 / Third-party attribution:</strong>
+  本页 HTML 由 <code>@LiuShiyuMath</code>（非 PR proposer）一次性手动生成，
+  以补足 <code>libz-renlab-ai/TeamBrain</code> PR #420 的 visual evidence。
+  按 <code>docs/VISUAL-PROOF-PR.md</code> + <code>docs/VISUAL-PROOF-FORMAT.md</code> canonical 规则，
+  HTML 应由 PR proposer 自己 host 在 <code>&lt;proposer&gt;.github.io</code>；
+  本页托管于 reviewer 自己的 <code>liushiyumath.github.io/teambrain-pr-proof-images/</code>，
+  属于显式偏离 canonical "proposer's own storage" 字面要求的一次性 third-party 补丁，
+  不构成对该规则的常态 carve-out。
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="n">+47 / -2</div><div class="l">net lines</div></div>
+  <div class="stat"><div class="n">3</div><div class="l">files changed</div></div>
+  <div class="stat"><div class="n">3</div><div class="l">commits</div></div>
+  <div class="stat"><div class="n">PASS</div><div class="l">/review iter-0</div></div>
+</div>
+
+<h2>1. What this PR ships, in one screen</h2>
+
+<p>新增一个 <code>项目:&lt;name&gt;</code> 字段，插入位置 = 既有 <code>拦过:T今</code> 与 <code>模型:M</code> 之间。
+Worktree-aware：从 git worktree 子目录运行也会走 <code>findMainCheckoutFromWorktree</code> walk-up 解析到 main checkout 的 basename，
+而不是 worktree 目录名。长名 &gt;32 字符自动 <code>...</code> 截断，根/空/不可读 cwd 回落 <code>unknown</code>。</p>
+
+<h3>插入位置（unified diff 摘要 — <code>scripts/teamagent-statusline.cjs</code> 第 814+ 行）</h3>
+
+<div class="diff">
+<span class="hdr">@@ render line @@</span><br>
+<span class="sub">- `TeamAgent | 规则:${count} | 帮过:${helpedToday}今/${helpedWeek}周 | 拦过:${riskToday}今${ccSegment} | ${hint}`</span><br>
+<span class="add">+ `TeamAgent | 规则:${count} | 帮过:${helpedToday}今/${helpedWeek}周 | 拦过:${riskToday}今 | 项目:${projectName}${ccSegment} | ${hint}`</span>
+</div>
+
+<h2>2. Real before/after — captured by running the actual binary</h2>
+
+<p style="color:#8b949e;font-size:13px;">
+四条 case 都是 reviewer 真实跑出来的 <code>node scripts/teamagent-statusline.cjs</code> 输出，
+不是 mockup、不是 PR body 的 self-claim 复述。
+绿色高亮 = 新插入段。
+</p>
+
+<div class="case">
+  <div class="title">Case 1 — Before (current main, no PR #420) <span class="verdict real">REAL CAPTURE</span></div>
+  <div class="cwd">$ cd <code>/Users/m1/projects/TeamBrain</code> &amp;&amp; node scripts/teamagent-statusline.cjs</div>
+  <div class="term">TeamAgent | 规则:57 | 帮过:0今/549周 | 拦过:3今 | <span class="hint">护航中</span></div>
+  <div class="why">基线 — 没有 <code>项目:</code> 字段，4 段 prefix 之后直接 hint。</div>
+</div>
+
+<div class="case">
+  <div class="title">Case 2 — After (PR head, run from main checkout) <span class="verdict real">REAL CAPTURE</span></div>
+  <div class="cwd">$ cd <code>/tmp/teamagent/visual-proof-pr-420/pr420-checkout</code> &amp;&amp; node scripts/teamagent-statusline.cjs</div>
+  <div class="term">TeamAgent | 规则:57 | 帮过:0今/549周 | 拦过:3今 | <span class="ins">项目:TeamBrain</span> | <span class="hint">护航中</span></div>
+  <div class="why">该 checkout 本身是 <code>/Users/m1/projects/TeamBrain</code> 的 git worktree
+    （<code>.git</code> 是 file 不是 dir）→ walk-up 解析到 <code>TeamBrain</code>，basename 不是 <code>pr420-checkout</code>。
+    证 worktree-aware 在 layer 1 就生效。</div>
+</div>
+
+<div class="case">
+  <div class="title">Case 3 — After (real <code>git worktree add</code> at <code>.claude/worktrees/issue-306</code>) <span class="verdict real">REAL CAPTURE</span></div>
+  <div class="cwd">$ cd <code>.../pr420-checkout/.claude/worktrees/issue-306</code> &amp;&amp; node scripts/teamagent-statusline.cjs</div>
+  <div class="term">TeamAgent | 规则:57 | 帮过:0今/549周 | 拦过:3今 | <span class="ins">项目:TeamBrain</span> | <span class="hint">护航中</span></div>
+  <div class="why">cwd basename = <code>issue-306</code>。<code>findMainCheckoutFromWorktree</code> 读 <code>.git</code> file
+    （<code>gitdir: .../.git/worktrees/issue-306</code>）→ <code>path.resolve(gitdir, "..", "..", "..")</code>
+    = <code>pr420-checkout</code> → 再向上 = <code>TeamBrain</code>。<strong>worktree-aware 真在工作。</strong></div>
+</div>
+
+<div class="case">
+  <div class="title">Case 4 — Fallback (cwd 没有合法 <code>.git</code> file，回落 basename) <span class="verdict real">REAL CAPTURE</span></div>
+  <div class="cwd">$ cd <code>.../pr420-checkout/.claude/worktrees/issue-306</code> (<em>plain mkdir, no <code>.git</code></em>) &amp;&amp; node scripts/teamagent-statusline.cjs</div>
+  <div class="term">TeamAgent | 规则:57 | 帮过:0今/549周 | 拦过:3今 | <span class="ins">项目:issue-306</span> | <span class="hint">护航中</span></div>
+  <div class="why"><code>findMainCheckoutFromWorktree</code> 看到 <code>fs.statSync(.git)</code> 失败 → 返回 <code>null</code> → 回落 <code>path.basename(cwd) = "issue-306"</code>。
+    这条 case 鸭鸭先用 <code>mkdir -p</code> 假装、再跑——结果证明非 worktree 子目录会显示 dir 名，
+    符合 PR 的 <em>"Detached worktree → falls back to <code>path.basename(cwd)</code>"</em> 自宣称。</div>
+</div>
+
+<h2>3. Edge cases derived from <code>getProjectName(cwd)</code> source</h2>
+
+<p style="color:#8b949e;font-size:13px;">
+下表是从 <code>scripts/teamagent-statusline.cjs:85-106</code> 的 <code>getProjectName</code> 源码人工推导，没真跑——
+但每条都对应源码里一个具体分支，reviewer 可对照源码核实。
+</p>
+
+<table>
+  <tr>
+    <th>cwd 类型</th>
+    <th>getProjectName 返回</th>
+    <th>触发的源码分支</th>
+  </tr>
+  <tr>
+    <td><code>/</code> 或 <code>.</code> 或空字符串</td>
+    <td><code>"unknown"</code></td>
+    <td><code>if (!base || base === "." || base === "/" || base === "\\") return "unknown";</code></td>
+  </tr>
+  <tr>
+    <td>basename 长度 ≤ 32</td>
+    <td><code>basename</code> 原样</td>
+    <td><code>return base.length &gt; 32 ? ... : base;</code> 走 false 分支</td>
+  </tr>
+  <tr>
+    <td>basename 长度 &gt; 32（例如 <code>this-is-a-very-long-monorepo-path-that-overflows</code>）</td>
+    <td>前 29 字符 + <code>...</code></td>
+    <td><code>return base.length &gt; 32 ? base.slice(0, 29) + "..." : base;</code></td>
+  </tr>
+  <tr>
+    <td>任何 fs / path / 抛异常</td>
+    <td><code>"unknown"</code></td>
+    <td>外层 <code>try / catch (return "unknown")</code> 包住整个函数</td>
+  </tr>
+</table>
+
+<h2>4. Reviewer 自己复现的 3 条命令</h2>
+
+<pre class="repro"><span class="cmt"># 1) 拉 PR head（不污染 main）</span>
+<span class="cmd">git fetch https://github.com/libz-renlab-ai/TeamBrain.git pull/420/head:pr-420-merged</span>
+<span class="cmd">git worktree add /tmp/pr420 pr-420-merged</span>
+
+<span class="cmt"># 2) 主 checkout 跑（应见 项目:TeamBrain）</span>
+<span class="cmd">(cd /tmp/pr420 &amp;&amp; node scripts/teamagent-statusline.cjs)</span>
+
+<span class="cmt"># 3) 真 worktree 子目录跑（仍应见 项目:TeamBrain，证 walk-up）</span>
+<span class="cmd">(cd /tmp/pr420 &amp;&amp; git worktree add ./.claude/worktrees/issue-306 -b proof pr-420-merged)</span>
+<span class="cmd">(cd /tmp/pr420/.claude/worktrees/issue-306 &amp;&amp; node scripts/teamagent-statusline.cjs)</span></pre>
+
+<h2>5. 既有测试为何不破</h2>
+
+<p style="font-size:13px;color:#c9d1d9;">
+<code>packages/cli/src/__tests__/statusline-format.test.ts</code> 在 <code>line 459 / 475</code> 锁了
+<code>"TeamAgent | 规则:0 | 帮过:0今/0周 | 拦过:0今"</code> 这段 4-field prefix 的字面 substring。
+PR 把 <code>项目:</code> 插在该 prefix <strong>之后、CC 字段之前</strong>，所以 substring 仍在；
+正则 <code>/TeamAgent \| 规则:0 \| 帮过:0今\/0周 \| 拦过:0今 \| /</code> 的尾部 <code>" | "</code> 也仍匹配
+（新字段同样以 <code>" | "</code> 起头）。Insertion-after-prefix 是非破坏的设计选择。
+</p>
+
+<div class="footer">
+  <div>Generated by <code>@LiuShiyuMath</code> on this Mac (<code>$USER = m1</code>) at
+    <code id="ts-iso"></code>.
+    Source PR: <a href="https://github.com/libz-renlab-ai/TeamBrain/pull/420">https://github.com/libz-renlab-ai/TeamBrain/pull/420</a>.
+    Hosted at <a href="https://liushiyumath.github.io/teambrain-pr-proof-images/pr-420-statusline-project-field/">
+      liushiyumath.github.io/teambrain-pr-proof-images/pr-420-statusline-project-field/</a>.
+  </div>
+  <div style="margin-top:8px;">
+    Self-contained: zero external CDN URLs, all CSS inlined, no <code>&lt;script src&gt;</code>.
+    Conforms to <code>docs/VISUAL-PROOF-FORMAT.md</code> self-contained probe (
+    <code>grep -E "https?://[^/]+/.*\.(js|css)" index.html</code> = empty).
+  </div>
+</div>
+
+<script>
+  // single inline script, no src — used only to stamp the build time so the
+  // page is self-explanatory. removable; page renders fine without JS.
+  document.getElementById("ts-iso").textContent = new Date().toISOString();
+</script>
+
+</body>
+</html>
